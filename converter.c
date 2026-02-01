@@ -3,15 +3,25 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
 #define BUFFER_SIZE (1024*1024) // 1mb
 
+// Функция вывода help информации
 void PrintHelp()
 {
-    printf("Программа конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
+    printf("\nПрограмма конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
     printf("Использование:\n");
-    printf("conv.exe -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
-    printf("conv.exe -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
+    printf("\nДля Win системы\n");
+    printf("./conv.exe -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
+    printf("./conv.exe -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
+    printf("\nДля Linux системы\n");
+    printf("./conv -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
+    printf("./conv -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
 }
+
 // Функция конвертации HEX символа в бинарный
 // [in] cSymbol    конвертируемый HEX символ
 // result          Bin символ
@@ -79,19 +89,20 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
             if (fprintf(pOutputFile, "%02X", pcBuffer[i]) < 0)
             {
                 printf("\nОшибка. Ошибка при записи в файл HEX\n");
+                free(pcBuffer);
                 fclose(pInputFile);
                 fclose(pOutputFile);
                 return 1;
             }
         }
     }
-
+ 
+    // Освобождение ресурсов
     free(pcBuffer);
     fclose(pInputFile);
     fclose(pOutputFile);
 
     return nResult;
-
 }
 
 // Функция конвертации HEX файла в Bin
@@ -207,18 +218,41 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
 
 int main(int argc, char *argv[]) 
 {
-    // Обработка вызова -h
-    if(argc == 2 && !strcmp(argv[1], "-h"))
+    #ifdef _WIN32
+        SetConsoleOutputCP(CP_UTF8);
+    #endif
+
+    // Проверка, если не введены агрументы
+    if(argc == 1)
     {
         PrintHelp();
+        #ifdef _WIN32
+            getchar();
+        #endif 
+
         return 0;
     }
 
+    // Обработка вызова -h
+    if(!strcmp(argv[1], "-h"))
+    {
+        PrintHelp();
+        #ifdef _WIN32
+            getchar();
+        #endif       
+        return 0;
+    }
+    
     // Проверка количества аргументов
     if(argc != 3)
     {
         printf("\nОшибка. Неизвестный параметр.\nИнструкция по использованию -h\n");
-        return 1;
+        
+       #ifdef _WIN32
+            getchar();
+        #else        
+            return 1;
+        #endif
 
     }
 
@@ -231,6 +265,9 @@ int main(int argc, char *argv[])
     if (nFileNameLen < 5) 
     {
         printf("\nОшибка. Неверное имя файла\n");
+        #ifdef _WIN32
+            getchar();
+        #endif        
         return 1;
     }   
 
@@ -240,7 +277,10 @@ int main(int argc, char *argv[])
         // Проверка, что имя файла имеет расширение .HEX
         if (strcmp(pcInFileName + nFileNameLen - 4, ".hex")) 
         {
-            printf("\nОшибка.Неверное имя файла\n");
+            printf("\nОшибка. Неверный тип файла\n");
+            #ifdef _WIN32
+                getchar();
+            #endif       
             return 1;
         }
 
@@ -249,7 +289,6 @@ int main(int argc, char *argv[])
         strcpy(pcOutFileName, pcInFileName);
         strcat(pcOutFileName, ".bin");
         
-
        nResult = ConvertFileHexToBin(pcInFileName, pcOutFileName);
     }
     // Проверка, что агрумент -a
@@ -258,7 +297,11 @@ int main(int argc, char *argv[])
         // Проверка, что имя файла имеет расширение .bin
         if (strcmp(pcInFileName + nFileNameLen - 4, ".bin")) 
         {
-            printf("\nОшибка.Неверное имя файла\n");
+            printf("\nОшибка. Неверный тип файла\n");
+            #ifdef _WIN32
+                getchar();
+                nResult = 1;
+            #endif        
             return 1;
         }
 
@@ -268,6 +311,19 @@ int main(int argc, char *argv[])
         strcat(pcOutFileName, ".hex");
 
         nResult = ConvertFileBinToHex(pcInFileName, pcOutFileName);
+    }
+    else
+    {
+        printf("\nОшибка. Неизвестный параметр\nИнструкция по использованию -h\n");
+        #ifdef _WIN32
+                getchar();
+        #endif      
+        return 1;
+    }
+
+    if(!nResult)
+    {
+        printf("\nУспешное конвертирование файла.\n");
     }
 
     return nResult;
