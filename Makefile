@@ -1,11 +1,23 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
+OUTPUT = conv
 
-all: converter
+ifeq ($(OS),Windows_NT)
+    EXT = .exe
+	RM = del /Q
+else
+    EXT =
+	RM = rm -f
+endif
 
-converter: converter.c
-	$(CC) $(CFLAGS) -o converter converter.c
-	@echo "Проект собран\n"
+TARGET = $(OUTPUT)$(EXT)
+
+all: $(TARGET)
+
+$(TARGET): converter.c
+	$(CC) $(CFLAGS) -o $(TARGET) converter.c
+	@echo "Build successful"
 clean:
-	rm -rf *.o converter
-	@echo "Проект очищен\n"
+	$(RM) *.o $(TARGET)
+	@echo "Clean completed"
+
