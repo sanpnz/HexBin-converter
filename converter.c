@@ -14,12 +14,13 @@ void PrintHelp()
 {
     printf("\nПрограмма конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
     printf("Использование:\n");
-    printf("\nДля Win системы\n");
+    #ifdef _WIN32
     printf("./conv.exe -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
     printf("./conv.exe -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
-    printf("\nДля Linux системы\n");
+    #else
     printf("./conv -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
     printf("./conv -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
+    #endif
 }
 
 // Функция конвертации HEX символа в бинарный
@@ -237,9 +238,6 @@ int main(int argc, char *argv[])
     if(!strcmp(argv[1], "-h"))
     {
         PrintHelp();
-        #ifdef _WIN32
-            getchar();
-        #endif       
         return 0;
     }
     
@@ -247,13 +245,7 @@ int main(int argc, char *argv[])
     if(argc != 3)
     {
         printf("\nОшибка. Неизвестный параметр.\nИнструкция по использованию -h\n");
-        
-       #ifdef _WIN32
-            getchar();
-        #else        
-            return 1;
-        #endif
-
+        return 1;
     }
 
     int nResult = 0;
@@ -264,10 +256,7 @@ int main(int argc, char *argv[])
     size_t nFileNameLen = strlen(pcInFileName);
     if (nFileNameLen < 5) 
     {
-        printf("\nОшибка. Неверное имя файла\n");
-        #ifdef _WIN32
-            getchar();
-        #endif        
+        printf("\nОшибка. Неверное имя файла\n");     
         return 1;
     }   
 
@@ -277,10 +266,7 @@ int main(int argc, char *argv[])
         // Проверка, что имя файла имеет расширение .HEX
         if (strcmp(pcInFileName + nFileNameLen - 4, ".hex")) 
         {
-            printf("\nОшибка. Неверный тип файла\n");
-            #ifdef _WIN32
-                getchar();
-            #endif       
+            printf("\nОшибка. Неверный тип файла\n");     
             return 1;
         }
 
@@ -297,11 +283,7 @@ int main(int argc, char *argv[])
         // Проверка, что имя файла имеет расширение .bin
         if (strcmp(pcInFileName + nFileNameLen - 4, ".bin")) 
         {
-            printf("\nОшибка. Неверный тип файла\n");
-            #ifdef _WIN32
-                getchar();
-                nResult = 1;
-            #endif        
+            printf("\nОшибка. Неверный тип файла\n");      
             return 1;
         }
 
@@ -314,10 +296,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("\nОшибка. Неизвестный параметр\nИнструкция по использованию -h\n");
-        #ifdef _WIN32
-                getchar();
-        #endif      
+        printf("\nОшибка. Неизвестный параметр\nИнструкция по использованию -h\n");     
         return 1;
     }
 
