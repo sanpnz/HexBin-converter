@@ -78,6 +78,7 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
         printf("\nОшибка. Ошибка выделения памяти для буфера\n");
         fclose(pInputFile);
         fclose(pOutputFile);
+        remove(pcOutFileName);
         return 1;
     }
    
@@ -93,6 +94,7 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
                 free(pcBuffer);
                 fclose(pInputFile);
                 fclose(pOutputFile);
+                remove(pcOutFileName);
                 return 1;
             }
         }
@@ -102,7 +104,7 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
     free(pcBuffer);
     fclose(pInputFile);
     fclose(pOutputFile);
-
+    
     return nResult;
 }
 
@@ -138,6 +140,7 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
         printf("\nОшибка. Ошибка выделения памяти для буфера\n");
         fclose(pInputFile);
         fclose(pOutputFile);
+        remove(pcOutFileName);
         return 1;
     }
     // Количество прочитанных байт
@@ -204,15 +207,22 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
         }
     }
 
-    if(nHigh != -1 && nResult)
+    if(nHigh != -1 && !nResult)
     {
         printf("\nОшибка. Нечетное количество HEX сиволов\n");
+        nResult = 1;
     }
-    
+
     // Освобождение ресурсов
     free(pcBuffer);
     fclose(pInputFile);
     fclose(pOutputFile);
+
+    // В случае ошибки записи в файл, удаление
+    if(nResult)
+    {
+        remove(pcOutFileName);
+    }
 
     return nResult;
 }
