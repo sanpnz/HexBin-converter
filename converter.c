@@ -5,6 +5,13 @@
 
 #define BUFFER_SIZE (1024*1024) // 1mb
 
+void PrintHelp()
+{
+    printf("Программа конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
+    printf("Использование:\n");
+    printf("conv.exe -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
+    printf("conv.exe -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
+}
 // Функция конвертации HEX символа в бинарный
 // [in] cSymbol    конвертируемый HEX символ
 // result          Bin символ
@@ -62,7 +69,7 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
         fclose(pOutputFile);
         return 1;
     }
-
+   
     // Количество прочитанных байт
     size_t ulBytesRead;
     while ((ulBytesRead = fread(pcBuffer, 1, BUFFER_SIZE, pInputFile)) > 0) 
@@ -203,7 +210,7 @@ int main(int argc, char *argv[])
     // Обработка вызова -h
     if(argc == 2 && !strcmp(argv[1], "-h"))
     {
-        printf("\nRequested help\n");
+        PrintHelp();
         return 0;
     }
 
@@ -263,7 +270,5 @@ int main(int argc, char *argv[])
         nResult = ConvertFileBinToHex(pcInFileName, pcOutFileName);
     }
 
-    printf("\nEnd Project\n");
-   
     return nResult;
 }
