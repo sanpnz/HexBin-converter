@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <ctype.h>
+#include <stdlib.h>
+
+#define BUFFER_SIZE (1024*1024) // 1mb
 
 // Функция конвертации Hex символа в бинарный
 // [in] cSymbol    конвертируемый Hex символ
@@ -38,7 +40,7 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
     FILE *pInputFile = fopen(pcInFileName, "r");
     if(!pInputFile)
     {
-        printf("\nНе удалось открыть файл для чтения\n");
+        perror("\nНе удалось открыть файл для чтения");
         return 1;
     }
 
@@ -46,13 +48,20 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
     FILE *pOutputFile = fopen(pcOutFileName, "wb");
     if(!pOutputFile)
     {
-        printf("\nНе удалось открыть файл для записи\n");
+        perror("\nНе удалось открыть файл для записи\n");
         fclose(pInputFile);
         return 1;
     }
  
     // Буфер под данные
-    char pcBuffer[4096];
+    char *pcBuffer = (char *)malloc(BUFFER_SIZE);
+    if(!pcBuffer)
+    {
+        printf("\nОшибка. Ошибка выделения памяти для буфера\n");
+        fclose(pInputFile);
+        fclose(pOutputFile);
+        return 1;
+    }
     // Количество прочитанных байт
     size_t ulBytesRead;
     // Признак старшего полубайта
@@ -117,7 +126,13 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
             break;
         }
     }
+
+    if(nHigh != -1)
+    {
+        printf("\nОшибка. Нечетное количество Hex сиволов\n");
+    }
     
+    free(pcBuffer);
     fclose(pInputFile);
     fclose(pOutputFile);
 
