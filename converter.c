@@ -5,8 +5,8 @@
 
 #define BUFFER_SIZE (1024*1024) // 1mb
 
-// Функция конвертации Hex символа в бинарный
-// [in] cSymbol    конвертируемый Hex символ
+// Функция конвертации HEX символа в бинарный
+// [in] cSymbol    конвертируемый HEX символ
 // result          Bin символ
 int ConvertSymbolHexToBin(char cSymbol)
 {
@@ -28,7 +28,66 @@ int ConvertSymbolHexToBin(char cSymbol)
     return -1;
 }
 
-// Функция конвертации HEX файла в бинарный
+// Функция конвертации Bin файла в HEX
+// [in] pcInFileName    имя входнохо файла
+// [in] pcOutFileName   имя выходного файла
+// result               результат выполнения
+int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName) 
+{
+    int nResult = 0;
+
+    // Открытие файла на чтение
+    FILE *pInputFile = fopen(pcInFileName, "rb");
+    if(!pInputFile)
+    {
+        perror("\nНе удалось открыть файл для чтения");
+        return 1;
+    }
+
+    // Открытие файла на запись
+    FILE *pOutputFile = fopen(pcOutFileName, "w");
+    if(!pOutputFile)
+    {
+        perror("\nНе удалось открыть файл для записи\n");
+        fclose(pInputFile);
+        return 1;
+    }
+
+    // Буфер под данные
+    char *pcBuffer = (char *)malloc(BUFFER_SIZE);
+    if(!pcBuffer)
+    {
+        printf("\nОшибка. Ошибка выделения памяти для буфера\n");
+        fclose(pInputFile);
+        fclose(pOutputFile);
+        return 1;
+    }
+
+    // Количество прочитанных байт
+    size_t ulBytesRead;
+    while ((ulBytesRead = fread(pcBuffer, 1, BUFFER_SIZE, pInputFile)) > 0) 
+    {
+        for (size_t i = 0; i < ulBytesRead; i++) 
+        {
+            if (fprintf(pOutputFile, "%02X", pcBuffer[i]) < 0)
+            {
+                printf("\nОшибка. Ошибка при записи в файл HEX\n");
+                fclose(pInputFile);
+                fclose(pOutputFile);
+                return 1;
+            }
+        }
+    }
+
+    free(pcBuffer);
+    fclose(pInputFile);
+    fclose(pOutputFile);
+
+    return nResult;
+
+}
+
+// Функция конвертации HEX файла в Bin
 // [in] pcInFileName    имя входнохо файла
 // [in] pcOutFileName   имя выходного файла
 // result               результат выполнения
@@ -67,7 +126,7 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
     // Признак старшего полубайта
     int nHigh = -1;
 
-    while ((ulBytesRead = fread(pcBuffer, 1, sizeof(pcBuffer), pInputFile)) > 0) 
+    while ((ulBytesRead = fread(pcBuffer, 1, BUFFER_SIZE, pInputFile)) > 0) 
     {
         for (size_t i = 0; i < ulBytesRead; i++) 
         {
@@ -87,11 +146,11 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
                 break;
             }
 
-            // Преобразование текущего Hex символа в Bin
+            // Преобразование текущего HEX символа в Bin
             int nConvertedSymbol = ConvertSymbolHexToBin(nCurSymbol);
             if(nConvertedSymbol == -1)
             {
-                printf("\nОшибка. Ошибка конвертации Hex->Bin\n");
+                printf("\nОшибка. Ошибка конвертации HEX->Bin\n");
                 nResult = 1;
                 break;
             }
@@ -110,7 +169,7 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
                 // Запись преобразованного символа в файл
                 if (fwrite(&byte, 1, 1, pOutputFile) != 1) 
                 {
-                    printf("\nОшибка. Ошибка записи в файл\n");
+                    printf("\nОшибка. Ошибка записи в файл \n");
                     nResult = 1;
                     break;
                 }
@@ -122,16 +181,16 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
 
         if (nResult)
         {
-            printf("\nОшибка\n");
             break;
         }
     }
 
-    if(nHigh != -1)
+    if(nHigh != -1 && nResult)
     {
-        printf("\nОшибка. Нечетное количество Hex сиволов\n");
+        printf("\nОшибка. Нечетное количество HEX сиволов\n");
     }
     
+    // Освобождение ресурсов
     free(pcBuffer);
     fclose(pInputFile);
     fclose(pOutputFile);
@@ -160,18 +219,18 @@ int main(int argc, char *argv[])
     // Получение имени файла
     char *pcInFileName = argv[2];
 
+    // Проверка, что имя файла не менее 5 символов
+    size_t nFileNameLen = strlen(pcInFileName);
+    if (nFileNameLen < 5) 
+    {
+        printf("\nОшибка. Неверное имя файла\n");
+        return 1;
+    }   
+
     // Проверка, что агрумент -a
     if(!strcmp(argv[1], "-a"))
     {
-        // Проверка, что имя файла не менее 5 символов
-        size_t nFileNameLen = strlen(pcInFileName);
-        if (nFileNameLen < 5) 
-        {
-            printf("\nОшибка. Неверное имя файла\n");
-            return 1;
-        }   
-
-        // Проверка, что имя файла имеет расширение .hex
+        // Проверка, что имя файла имеет расширение .HEX
         if (strcmp(pcInFileName + nFileNameLen - 4, ".hex")) 
         {
             printf("\nОшибка.Неверное имя файла\n");
@@ -185,6 +244,23 @@ int main(int argc, char *argv[])
         
 
        nResult = ConvertFileHexToBin(pcInFileName, pcOutFileName);
+    }
+    // Проверка, что агрумент -a
+    else if(!strcmp(argv[1], "-b"))
+    {
+        // Проверка, что имя файла имеет расширение .bin
+        if (strcmp(pcInFileName + nFileNameLen - 4, ".bin")) 
+        {
+            printf("\nОшибка.Неверное имя файла\n");
+            return 1;
+        }
+
+        // Формирование имени выходного файла
+        char pcOutFileName[nFileNameLen + 5];
+        strcpy(pcOutFileName, pcInFileName);
+        strcat(pcOutFileName, ".hex");
+
+        nResult = ConvertFileBinToHex(pcInFileName, pcOutFileName);
     }
 
     printf("\nEnd Project\n");
