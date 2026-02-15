@@ -10,17 +10,13 @@
 #define BUFFER_SIZE (1024*1024) // 1mb
 
 // Функция вывода help информации
-void PrintHelp()
+void PrintHelp(const char* progName)
 {
     printf("\nПрограмма конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
     printf("Использование:\n");
-    #ifdef _WIN32
-    printf("./conv.exe -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
-    printf("./conv.exe -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
-    #else
-    printf("./conv -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n");
-    printf("./conv -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n");
-    #endif
+    printf("%s -a file-name.hex   Конвертирует входной HEX файл в выходной бинарный файл с именем \"file-name.hex.bin\"\n", progName);
+    printf("%s -b file-name.bin   Конвертирует входной бинарный файл в выходной файл в формате HEX с именем \"file-name.bin.hex\"\n", progName);
+
 }
 
 // Функция конвертации HEX символа в бинарный
@@ -236,7 +232,7 @@ int main(int argc, char *argv[])
     // Проверка, если не введены агрументы
     if(argc == 1)
     {
-        PrintHelp();
+        PrintHelp(argv[0]);
         #ifdef _WIN32
             getchar();
         #endif 
@@ -247,7 +243,7 @@ int main(int argc, char *argv[])
     // Обработка вызова -h
     if(!strcmp(argv[1], "-h"))
     {
-        PrintHelp();
+        PrintHelp(argv[0]);
         return 0;
     }
     
