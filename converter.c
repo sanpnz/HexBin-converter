@@ -93,6 +93,7 @@ int ConvertSymbolHexToBin(char cSymbol)
     return -1;
 }
 
+<<<<<<< HEAD
 /**
  * Функция преобразования бинарного файла в HEX файл
  * 
@@ -100,6 +101,12 @@ int ConvertSymbolHexToBin(char cSymbol)
  * @param pcOutFileName - имя выходного HEX файла
  * @return              - 0 при успешном завершении, 1 при ошибке
  */
+=======
+// Функция конвертации Bin файла в HEX
+// [in] pcInFileName    имя входнохо файла
+// [in] pcOutFileName   имя выходного файла
+// result               результат выполнения 0 - Успех, 1 - Неудача
+>>>>>>> 765d57298cb92e4f02ed7a2a82681e2cacf94ac4
 int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName) 
 {
     int nResult = 0;
@@ -150,6 +157,7 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
     return nResult;
 }
 
+<<<<<<< HEAD
 /**
  * Функция преобразования HEX файла в бинарный
  * 
@@ -157,6 +165,12 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
  * @param pcOutFileName - имя выходного бинарного файла
  * @return                0 при успешном завершении, 1 при ошибке
  */
+=======
+// Функция конвертации HEX файла в Bin
+// [in] pcInFileName    имя входнохо файла
+// [in] pcOutFileName   имя выходного файла
+// result               результат выполнения 0 - Успех, 1 - Неудача
+>>>>>>> 765d57298cb92e4f02ed7a2a82681e2cacf94ac4
 int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName) 
 {
     int nResult = 0;
@@ -324,7 +338,7 @@ int main(int argc, char *argv[])
         
        nResult = ConvertFileHexToBin(pcInFileName, pcOutFileName);
     }
-    // Проверка, что агрумент -a
+    // Проверка, что агрумент -b
     else if(!strcmp(argv[1], "-b"))
     {
         // Проверка, что имя файла имеет расширение .bin
