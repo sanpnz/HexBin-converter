@@ -9,7 +9,12 @@
 
 #define BUFFER_SIZE (1024*1024) // 1mb
 
-// Функция вывода help информации
+/**
+ * Функция вывода help информации
+ * 
+ * @param progName - имя исполняемой программы
+ * 
+ */
 void PrintHelp(const char* progName)
 {
     printf("\nПрограмма конвертации файла ASCII HEX в бинарное содержимое и наоборот\n");
@@ -19,6 +24,17 @@ void PrintHelp(const char* progName)
 
 }
 
+/**
+ * Функция открытия файлов для конвертации
+ * 
+ * @param pcInFileName  - имя входного файла
+ * @param pcOutFileName - имя выходного файла
+ * @param isHexToBin    - 1 для HEX->BIN (текстовый вход, бинарный выход),
+ *                        0 для BIN->HEX (бинарный вход, текстовый выход)
+ * @param ppInputFile   - указатель на указатель входного файла (будет изменён)
+ * @param ppOutputFile  - указатель на указатель выходного файла (будет изменён)
+ * @return                0 при успехе, 1 при ошибке
+ */
 int FileOpen(const char *pcInFileName, const char *pcOutFileName, int isHexToBin, FILE** ppInputFile, FILE** ppOutputFile)
 {
 
@@ -49,9 +65,14 @@ int FileOpen(const char *pcInFileName, const char *pcOutFileName, int isHexToBin
 
     return 0;
 }
-// Функция конвертации HEX символа в бинарный
-// [in] cSymbol    конвертируемый HEX символ
-// result          Bin символ
+
+/**
+ * Функция преобразования шестнадцатеричного символа в его числовое значение (Hex->Bin)
+ * 
+ * @param cSymbol - HEX символ для конвертации (допустимы '0'-'9', 'A'-'F', 'a'-'f')
+ * @return          Числовое значение от 0 до 15 при успехе, -1 при ошибке
+ * 
+ */
 int ConvertSymbolHexToBin(char cSymbol)
 {
     if (cSymbol >= '0' && cSymbol <= '9') 
@@ -72,10 +93,13 @@ int ConvertSymbolHexToBin(char cSymbol)
     return -1;
 }
 
-// Функция конвертации Bin файла в HEX
-// [in] pcInFileName    имя входнохо файла
-// [in] pcOutFileName   имя выходного файла
-// result               результат выполнения
+/**
+ * Функция преобразования бинарного файла в HEX файл
+ * 
+ * @param pcInFileName  - имя входного бинарного файла
+ * @param pcOutFileName - имя выходного HEX файла
+ * @return              - 0 при успешном завершении, 1 при ошибке
+ */
 int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName) 
 {
     int nResult = 0;
@@ -126,10 +150,13 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
     return nResult;
 }
 
-// Функция конвертации HEX файла в Bin
-// [in] pcInFileName    имя входнохо файла
-// [in] pcOutFileName   имя выходного файла
-// result               результат выполнения
+/**
+ * Функция преобразования HEX файла в бинарный
+ * 
+ * @param pcInFileName  - имя входного HEX файла
+ * @param pcOutFileName - имя выходного бинарного файла
+ * @return                0 при успешном завершении, 1 при ошибке
+ */
 int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName) 
 {
     int nResult = 0;
