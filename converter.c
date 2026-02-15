@@ -19,6 +19,36 @@ void PrintHelp(const char* progName)
 
 }
 
+int FileOpen(const char *pcInFileName, const char *pcOutFileName, int isHexToBin, FILE** ppInputFile, FILE** ppOutputFile)
+{
+
+    // Проверка, что имена не пустые
+    if(!pcInFileName || !pcOutFileName)
+    {
+        printf("\nОшибка. Неверные параметры\n");
+        return 1;
+    }
+
+    // Открытие файла на чтение
+    *ppInputFile = fopen(pcInFileName, isHexToBin ? "r" : "rb");
+    if(!ppInputFile)
+    {
+        perror("\nНе удалось открыть файл для чтения");
+        return 1;
+    }
+
+    // Открытие файла на запись
+    *ppOutputFile = fopen(pcOutFileName, isHexToBin ? "wb" : "w");
+    if(!ppOutputFile)
+    {
+        perror("\nНе удалось открыть файл для записи\n");
+        fclose(*ppInputFile);
+        *ppInputFile = NULL;
+        return 1;
+    }
+
+    return 0;
+}
 // Функция конвертации HEX символа в бинарный
 // [in] cSymbol    конвертируемый HEX символ
 // result          Bin символ
@@ -50,20 +80,12 @@ int ConvertFileBinToHex(const char *pcInFileName, const char *pcOutFileName)
 {
     int nResult = 0;
 
-    // Открытие файла на чтение
-    FILE *pInputFile = fopen(pcInFileName, "rb");
-    if(!pInputFile)
-    {
-        perror("\nНе удалось открыть файл для чтения");
-        return 1;
-    }
+    FILE *pInputFile = NULL;
+    FILE *pOutputFile =  NULL;
 
-    // Открытие файла на запись
-    FILE *pOutputFile = fopen(pcOutFileName, "w");
-    if(!pOutputFile)
+    nResult = FileOpen(pcInFileName, pcOutFileName, 0, &pInputFile, &pOutputFile);
+    if(nResult)
     {
-        perror("\nНе удалось открыть файл для записи\n");
-        fclose(pInputFile);
         return 1;
     }
 
@@ -112,20 +134,12 @@ int ConvertFileHexToBin(const char *pcInFileName, const char *pcOutFileName)
 {
     int nResult = 0;
 
-    // Открытие файла на чтение
-    FILE *pInputFile = fopen(pcInFileName, "r");
-    if(!pInputFile)
-    {
-        perror("\nНе удалось открыть файл для чтения");
-        return 1;
-    }
+    FILE *pInputFile = NULL;
+    FILE *pOutputFile =  NULL;
 
-    // Открытие файла на запись
-    FILE *pOutputFile = fopen(pcOutFileName, "wb");
-    if(!pOutputFile)
+    nResult = FileOpen(pcInFileName, pcOutFileName, 1, &pInputFile, &pOutputFile);
+    if(nResult)
     {
-        perror("\nНе удалось открыть файл для записи\n");
-        fclose(pInputFile);
         return 1;
     }
  
